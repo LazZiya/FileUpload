@@ -1,0 +1,126 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "File Upload Panel";
+}
+
+@section Styles{
+    <link rel="stylesheet" href="~/dropzone/min/basic.min.css" />
+    <link rel="stylesheet" href="~/dropzone/min/dropzone.min.css" />
+}
+
+<form method="post" class="dropzone" id="dropzoneForm" asp-action="./Index" enctype="multipart/form-data">
+    <div class="fallback">
+        <input type="file" name="files" multiple />
+        <input type="submit" value="Upload" />
+    </div>
+</form>
+
+<div class="modal fade" id="downloadModal" tabindex="-1" role="dialog" aria-labelledby="downloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h6 class="modal-title" id="downloadModalLabel">
+                    <i class='fas fa-download'></i> Download (<span id="modalFileSize"></span>)
+                </h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body form-group">
+                <label class="form-control-plaintext" id="modalFileName"></label>
+                <input type="text" id="modalUrl" class="form-control myUrl" value="" readonly />
+            </div>
+            <div class="modal-footer">
+                <a href="" class="btn btn-success" id="modalDownload" target="_blank">
+                    <i class='fas fa-download'></i>
+                    Download
+                </a>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/dropzone/min/dropzone.min.js"></script>
+
+    <script>
+        $('#downloadModal').on('show.bs.modal', function (e) {
+
+            //get data-id attribute of the clicked element
+            var fileUrl = $(e.relatedTarget).data('img-url');
+            var fileSize = $(e.relatedTarget).data('file-size');
+            var fileName = $(e.relatedTarget).data('file-name');
+
+            var fs = fileSize / (1024 * 1024);
+
+            //populate the textbox
+            $("#modalUrl").attr("value", fileUrl);
+            $("#modalDownload").attr("href", fileUrl);
+            $("#modalFileSize").html(fs.toFixed(2) + " MB");
+            $("#modalFileName").html(fileName);
+        });
+    </script>
+
+    <script>
+        Dropzone.options.dropzoneForm = {
+            addRemoveLinks: true,
+            paramName: "files", //default param name is "file", make it "files" so it matches parameter name in the method
+            dictRemoveFileConfirmation: "File will be deleted, click OK to continue?",
+            resizeWidth: 800,
+            resizeHeight: 600,
+            resizeMethod: 'contain',
+            resizeQuality: 1,
+
+            init: function () {
+                var myDropzone = this;
+                $.getJSON('./?handler=ListFolderContents').done(function (data) {
+                    //Call the action method to load the images from the server
+
+                    if (data!== null && data.length > 0) {
+
+                        $.each(data, function (index, item) {
+                            //// Create the mock file:
+                            var mockFile = {
+                                name: item.name,
+                                size: item.fileSize,
+                                filePath: item.filePath
+                            };
+
+                            // Call the default addedfile event handler
+                            myDropzone.emit("addedfile", mockFile);
+
+                            // And optionally show the thumbnail of the file:
+                            myDropzone.emit("thumbnail", mockFile, item.filePath);
+
+                            // Make sure there is no progress bar ober tha image
+                            myDropzone.emit("complete", mockFile);
+                        });
+                    }
+                });
+
+                myDropzone.on("addedfile", function (file) {
+                    var downloadBtn = Dropzone.createElement("<a class='dz-download' style='visibility:hidden' href='#downloadModal' data-file-name='" + file.name + "' data-toggle='modal' data-file-size='" + file.size + "' data-img-url='" + file.filePath + "'><i class='fas fa-download text-success'></i></a>");
+
+                    file.previewElement.appendChild(downloadBtn);
+
+                    file.previewElement.addEventListener("click", function () {
+                        downloadBtn.click();
+                    });
+                });
+            },
+
+            removedfile: function removedfile(file) {
+                $.getJSON("./?handler=DeleteFile&file=" + file.name).done(function (result) {
+                    console.log("delete: " + result);
+                    if (result === true) {
+                        if (file.previewElement != null && file.previewElement.parentNode != null) {
+                            file.previewElement.parentNode.removeChild(file.previewElement);
+                        }
+                    }
+                });
+            },
+        };
+    </script>
+}
