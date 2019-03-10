@@ -14,3 +14,15 @@ ASP.Net Core Razor project that implements file upload using dropzonejs
 - Delete files
 - Download modal
 - Client side resize
+
+## Localization 
+- Localization support for Dropzone messages to Arabic, Turkish and Chinese (AR, EN, TR, ZH) 
+- For more details about localization in Asp.Net Corer Razor PAges visit [Developing Multicultural Web Application](http://www.ziyad.info/en/articles/10-Developing_Multicultural_Web_Application)
+
+## Server side resize / watermark
+- Server side image resize and adding text / image watermarks using LazZiya.ImageResize nuget package
+- for more details about server side image resize and adding watermark visit [Image Resize For Asp.Net Core](http://ziyad.info/en/articles/29-Image_Resize_for_NetCore)
+
+## Licenses :
+- Visit [https://www.dropzonejs.com/](https://www.dropzonejs.com/) for more details abount Dropzone
+- This repository and LazZiya.ImageResize is licensed under MIT license
