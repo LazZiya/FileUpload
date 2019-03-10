@@ -26,23 +26,22 @@
     }
 }
 
-<div class="dropdown">
-    <a class="btn-sm btn-default border border-secondary dropdown-toggle" href="#" role="button" id="dropdownLang" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        @($"{requestCulture.DisplayName}")
-    </a>
-
-    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownLang">
-        @foreach (var culture in supportedCultures)
-        {
-            if (culture.Value.ToLower() != requestCulture.Name.ToLower())
+<ul class="nav navbar-nav navbar-right">
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">@($"{requestCulture.DisplayName}")<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            @foreach (var culture in supportedCultures)
             {
-                routeData["culture"] = culture.Value;
+                if (culture.Value.ToLower() != requestCulture.Name.ToLower())
+                {
+                    routeData["culture"] = culture.Value;
 
-                <a class="dropdown-item small"
-                   asp-all-route-data="@routeData">
-                    @culture.Text
-                </a>
+                    <li><a class="dropdown-item small"
+                       asp-all-route-data="@routeData">
+                        @culture.Text
+                    </a></li>
+                }
             }
-        }
-    </div>
-</div>
+        </ul>
+    </li>
+</ul>

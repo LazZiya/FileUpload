@@ -27,12 +27,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-page="/Index" class="navbar-brand">FileUpload</a>
+                <a asp-page="/Index" class="navbar-brand">File Upload</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-page="/Index">Home</a></li>
+                    <li><a asp-page="/Index">@_._("Upload")</a></li>
                 </ul>
+                <partial name="_LanguagePartial" />
             </div>
         </div>
     </nav>
@@ -43,7 +44,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2019 - FileUpload</p>
+            <p>&copy; 2019 - Ziyad.info</p>
         </footer>
     </div>
 
