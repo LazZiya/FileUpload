@@ -1,9 +1,12 @@
 ﻿using FileUpload.Utilities;
+using LazZiya.ImageResize;
+using LazZiya.ImageResize.Watermark;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -24,18 +27,50 @@ namespace FileUpload.Pages
 
         }
 
+        [ValidateAntiForgeryToken]
         public async Task OnPostAsync(List<IFormFile> files)
         {
-            foreach (var file in files)
+            foreach (var file in Request.Form.Files)
             {
-                //get uploaded file name
-                var fileName = file.TempFileName(true);
+                //get uploaded file name: true to create temp name, false to get real name
+                var fileName = file.TempFileName(false);
 
                 if (file.Length > 0)
                 {
-                    using (var stream = new FileStream($"wwwroot\\upload\\{fileName}", FileMode.Create))
+                    // optional : server side resize create image with watermark
+                    // these steps requires LazZiya.ImageResize package from nuget.org
+                    if (fileName.ToLower().EndsWith(".jpg") || fileName.ToLower().EndsWith(".png"))
                     {
-                        await file.CopyToAsync(stream);
+                        using (var stream = file.OpenReadStream())
+                        {
+                            // create image file from uploaded file stream
+                            // also possible to create image from file Image.FromFile("....")
+                            var img = Image.FromStream(stream);
+
+                            // resize to new image sizes (800x600)
+                            var newImg = ImageResize.ScaleAndCrop(img, 800, 400);
+
+                            // add text watermark to new image
+                            newImg.TextWatermark("http://Ziyad.info");
+
+                            // add image watermark to new image
+                            newImg.ImageWatermark("wwwroot\\images\\icon.png");
+
+                            _logger.LogInformation($"----> wwwroot\\upload\\{fileName}");
+                            // save as new image
+                            newImg.SaveAs($"wwwroot\\upload\\{fileName}");
+
+                            img.Dispose();
+                            newImg.Dispose();
+                        }
+                    }
+                    else
+                    {
+                        // upload and save files to upload folder
+                        using (var stream = new FileStream($"wwwroot\\upload\\{fileName}", FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
                     }
                 }
             }
@@ -43,7 +78,6 @@ namespace FileUpload.Pages
 
         public JsonResult OnGetListFolderContents()
         {
-            _logger.LogDebug("----> xxx");
             var folderPath = $"wwwroot\\upload";
 
             if (!Directory.Exists(folderPath))
