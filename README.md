@@ -25,4 +25,4 @@ ASP.Net Core Razor project that implements file upload using dropzonejs
 
 ## Licenses :
 - Visit [https://www.dropzonejs.com/](https://www.dropzonejs.com/) for more details about Dropzone
-- This repository and [LazZiya.ImageResize](http://ziyad.info/en/articles/29-Image_Resize_for_NetCore) is licensed under MIT license
+- This repository and [LazZiya.ImageResize](https://github.com/LazZiya/ImageResize) is licensed under MIT license
