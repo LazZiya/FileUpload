@@ -24,5 +24,5 @@ ASP.Net Core Razor project that implements file upload using dropzonejs
 - for more details about server side image resize and adding watermark visit [Image Resize For Asp.Net Core](http://ziyad.info/en/articles/29-Image_Resize_for_NetCore)
 
 ## Licenses :
-- Visit [https://www.dropzonejs.com/](https://www.dropzonejs.com/) for more details abount Dropzone
-- This repository and LazZiya.ImageResize is licensed under MIT license
+- Visit [https://www.dropzonejs.com/](https://www.dropzonejs.com/) for more details about Dropzone
+- This repository and [LazZiya.ImageResize](http://ziyad.info/en/articles/29-Image_Resize_for_NetCore) is licensed under MIT license
