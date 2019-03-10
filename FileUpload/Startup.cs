@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using FileUpload.Localization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,8 +28,24 @@ namespace FileUpload
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.Configure<RequestLocalizationOptions>(ops =>
+            {
+                ops.DefaultRequestCulture = new RequestCulture(Cultures.DefaultCulture);
+                ops.SupportedCultures = Cultures.SupporterCultures;
+                ops.SupportedUICultures = Cultures.SupporterCultures;
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                ops.RequestCultureProviders.Insert(0, new RouteValueRequestCultureProvider());
+            });
+
+            services.AddSingleton<CultureLocalizer>();
+
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddViewLocalization(ops => ops.ResourcesPath = "Resources")
+                .AddRazorPagesOptions(ops => {
+                    ops.Conventions.Add(new GlobalTemplatePageRouteModelConvention());
+                });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +61,7 @@ namespace FileUpload
                 app.UseHsts();
             }
 
+            app.UseRequestLocalization();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();

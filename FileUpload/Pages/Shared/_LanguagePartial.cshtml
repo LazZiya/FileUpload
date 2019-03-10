@@ -1,0 +1,48 @@
+﻿@using Microsoft.AspNetCore.Builder
+@using Microsoft.Extensions.Options
+@using System.Globalization
+
+@inject IOptions<RequestLocalizationOptions> LocOps
+
+@{
+    var requestCulture = CultureInfo.CurrentCulture;
+    var supportedCultures = LocOps.Value.SupportedUICultures
+        .Select(c => new SelectListItem
+        {
+            Value = $"{c.Name}",
+            Text = $"{c.DisplayName}"
+        }).ToList();
+
+    var routeData = new Dictionary<string, string>();
+
+    foreach (var r in ViewContext.RouteData.Values)
+    {
+        routeData.Add(r.Key, r.Value.ToString());
+    }
+
+    foreach (var qs in Context.Request.Query)
+    {
+        routeData.Add(qs.Key, qs.Value);
+    }
+}
+
+<div class="dropdown">
+    <a class="btn-sm btn-default border border-secondary dropdown-toggle" href="#" role="button" id="dropdownLang" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        @($"{requestCulture.DisplayName}")
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownLang">
+        @foreach (var culture in supportedCultures)
+        {
+            if (culture.Value.ToLower() != requestCulture.Name.ToLower())
+            {
+                routeData["culture"] = culture.Value;
+
+                <a class="dropdown-item small"
+                   asp-all-route-data="@routeData">
+                    @culture.Text
+                </a>
+            }
+        }
+    </div>
+</div>
