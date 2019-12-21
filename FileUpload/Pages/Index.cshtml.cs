@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -43,25 +44,16 @@ namespace FileUpload.Pages
                     {
                         using (var stream = file.OpenReadStream())
                         {
-                            // create image file from uploaded file stream
-                            // also possible to create image from file Image.FromFile("....")
-                            var img = Image.FromStream(stream);
-
-                            // resize to new image sizes (800x600)
-                            var newImg = ImageResize.ScaleAndCrop(img, 800, 400);
-
-                            // add text watermark to new image
-                            newImg.TextWatermark("http://Ziyad.info");
-
-                            // add image watermark to new image
-                            newImg.ImageWatermark("wwwroot\\images\\icon.png");
-
-                            _logger.LogInformation($"----> wwwroot\\upload\\{fileName}");
-                            // save as new image
-                            newImg.SaveAs($"wwwroot\\upload\\{fileName}");
-
-                            img.Dispose();
-                            newImg.Dispose();
+                            // Create image file from uploaded file stream
+                            // Then resize, and add text/image watermarks
+                            // And save
+                            using (var img = Image.FromStream(stream))
+                            {
+                                img.ScaleAndCrop(300, 300, TargetSpot.MiddleRight)
+                                .AddImageWatermark(@"wwwroot\images\icon.png")
+                                .AddTextWatermark("http://ziyad.info")
+                                .SaveAs($"wwwroot\\upload\\{fileName}");
+                            }
                         }
                     }
                     else
