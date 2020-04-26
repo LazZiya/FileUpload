@@ -49,7 +49,7 @@ namespace FileUpload.Pages
                             // And save
                             using (var img = Image.FromStream(stream))
                             {
-                                img.ScaleAndCrop(300, 300, TargetSpot.MiddleRight)
+                                img.ScaleAndCrop(300, 300, TargetSpot.Center)
                                 .AddImageWatermark(@"wwwroot\images\icon.png")
                                 .AddTextWatermark("http://ziyad.info")
                                 .SaveAs($"wwwroot\\upload\\{fileName}");
