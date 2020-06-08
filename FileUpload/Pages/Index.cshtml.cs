@@ -31,7 +31,7 @@ namespace FileUpload.Pages
         [ValidateAntiForgeryToken]
         public async Task OnPostAsync(List<IFormFile> files)
         {
-            foreach (var file in Request.Form.Files)
+            foreach (var file in files)
             {
                 //get uploaded file name: true to create temp name, false to get real name
                 var fileName = file.TempFileName(false);
