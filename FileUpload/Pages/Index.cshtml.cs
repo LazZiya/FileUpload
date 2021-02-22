@@ -1,14 +1,16 @@
 ﻿using FileUpload.Utilities;
 using LazZiya.ImageResize;
-using LazZiya.ImageResize.Watermark;
+using LazZiya.ImageResize.Animated;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -25,22 +27,24 @@ namespace FileUpload.Pages
 
         public void OnGet()
         {
-
+            
         }
 
         [ValidateAntiForgeryToken]
         public async Task OnPostAsync(List<IFormFile> files)
         {
+            var imgFiles = new[] { ".jpg", ".png", ".gif" };
             foreach (var file in files)
             {
                 //get uploaded file name: true to create temp name, false to get real name
                 var fileName = file.TempFileName(false);
-
+                var fileExt = fileName.Substring(fileName.LastIndexOf('.'));
+                _logger.LogInformation("File extension : " + fileExt);
                 if (file.Length > 0)
                 {
                     // optional : server side resize create image with watermark
                     // these steps requires LazZiya.ImageResize package from nuget.org
-                    if (fileName.ToLower().EndsWith(".jpg") || fileName.ToLower().EndsWith(".png"))
+                    if (imgFiles.Any(ext => ext.Equals(fileExt, StringComparison.OrdinalIgnoreCase)))
                     {
                         using (var stream = file.OpenReadStream())
                         {
@@ -49,10 +53,10 @@ namespace FileUpload.Pages
                             // And save
                             using (var img = Image.FromStream(stream))
                             {
-                                img.ScaleAndCrop(300, 300, TargetSpot.Center)
-                                .AddImageWatermark(@"wwwroot\images\icon.png")
-                                .AddTextWatermark("http://ziyad.info")
-                                .SaveAs($"wwwroot\\upload\\{fileName}");
+                                img.ScaleByWidth(800)
+                                    .AddTextWatermark("LazZiya.ImageResize",new TextWatermarkOptions { TextColor = Color.FromArgb(255, Color.White), FontSize = 14 })
+                                    .AddImageWatermark("wwwroot/images/icon.png", new ImageWatermarkOptions { Opacity = 50 })
+                                    .SaveAs($"wwwroot/upload/resized_{fileName}");
                             }
                         }
                     }
