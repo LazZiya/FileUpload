@@ -2,8 +2,7 @@
 Asp.Net Core Razor Pages file upload using Dropzone.js [https://www.dropzonejs.com/](https://www.dropzonejs.com/)
 
 ## Tutorial
-For step by step tutorial visit projects page 
-[http://www.ziyad.info/en/articles/31-File_Upload_Razor_Pages](http://www.ziya.info.tr/en/articles/31-File_Upload_Razor_Pages)
+For [step by step tutorial visit projects page](https://ziya.info.tr/en/articles/file-upload-in-asp-dot-net-core)
 
 ## Contents :
 ASP.Net Core Razor project that implements file upload using dropzonejs
